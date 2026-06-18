@@ -4,6 +4,22 @@
 
 ---
 
+## Why This Matters
+ 
+Most embedded projects run on top of an RTOS or Linux. This project has none of that.
+ 
+Every mechanism here that developers normally take for granted — stack initialization, `.bss` clearing, interrupt routing, virtual memory — had to be built explicitly, from first principles, consulting the ARMv7-A Architecture Reference Manual and the AM335x Technical Reference Manual register by register.
+ 
+The result is a functional preemptive multitasking kernel where:
+ 
+- The CPU boots into Supervisor mode at `0x70010000`, configures stacks for all six ARM privilege modes (IRQ, FIQ, SVC, ABT, UND, SYS), and enables interrupts before transferring control to C.
+- The MMU maps each task to its own virtual address space via independent first-level translation tables, with TTBR0 swapped on every context switch and the TLB invalidated to prevent address aliasing.
+- Interrupts are handled entirely in Assembly: the IRQ handler saves all general-purpose registers plus SPSR onto the IRQ stack and returns via `SUBS PC, LR, #4` to atomically restore CPSR and resume the preempted task.
+- The linker script (`td3_memmap.ld`) defines explicit PHY/VMA/LMA triplets for each region — kernel, three tasks, per-task stacks, and per-task translation tables — giving the developer full control over the physical memory layout of the final binary.
+This kind of low-level fluency is what separates a developer who can work productively on bare-metal SoC firmware from one who needs an OS underneath.
+ 
+---
+
 ## 📋 Table of Contents
 
 - [Overview](#overview)
@@ -128,6 +144,22 @@ Provides C wrappers for ARM CP15 coprocessor registers (TTBR0, DACR, SCTLR). The
 
 ### Tasks (`tareas.s`)
 Three tasks are defined in assembly and placed into dedicated linker sections (`.tarea_1_txt`, `.tarea_2_txt`, `.idle_txt`). Each task runs in its own virtual address space.
+
+### Linker Script (`td3_memmap.ld`)
+ 
+The linker script is the authoritative document for the system's physical memory layout. It defines three address categories per region:
+ 
+| Address type | Purpose |
+|---|---|
+| **PHY** | Physical address where the region lives in RAM |
+| **VMA** | Virtual address the CPU uses at runtime (post-MMU) |
+| **LMA** | Load address where the binary is placed by the linker |
+ 
+For example, Task 1's code is linked at `TAREA_1_TXT_VMA = 0x70F50000` but physically resides at `TAREA_1_TXT_LMA`, computed at link time from the preceding sections. The MMU translates VMA → PHY at runtime, while the startup code copies each section from LMA to PHY before enabling the MMU.
+ 
+Per-task translation tables (`SYSTABLES_TAREA_*`) are placed at their own LMA (`0x50020000`, `0x50820000`, `0x50C20000`) so that each task's page table occupies a separate 4 MB-aligned physical region — a requirement of the ARM TTBR0 base address alignment constraint.
+ 
+Each task also has its own independently-sized stack, with dedicated regions for IRQ, FIQ, SVC, ABT, UND, and SYS modes. Stack top symbols (`tarea1_irq_stack_top`, etc.) are exported from the linker script and consumed directly in `startup.s` to initialize the SP register for each ARM mode.
 
 ---
 
