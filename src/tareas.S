@@ -5,7 +5,7 @@
 .global t2_stack_init
 .global kernel_stack_init
 .global load_context
-.code 32                        ## Modo arm 32 bits
+.code 32                        @ Modo arm 32 bits
 
 .extern tarea1_irq_stack_top
 .extern tarea1_fiq_stack_top
