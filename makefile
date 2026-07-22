@@ -32,45 +32,45 @@ $(OBJ)bios.elf: $(OBJ)tareas.o $(OBJ)gic.o $(OBJ)exception_handler.o $(OBJ)start
 
 #Ensamblado de archivo assembler, genero los objetos
 
-$(OBJ)tareas.o: $(SRC)tareas.s
+$(OBJ)tareas.o: $(SRC)tareas.S
 	
 	mkdir -p bin
 	mkdir -p obj
 	mkdir -p lst
-	@echo "Compilando tareas.s"
-	$(CHAIN)-as $(SRC)tareas.s -o $(OBJ)tareas.o -a > $(LST)tareas.lst
+	@echo "Compilando tareas.S"
+	$(CHAIN)-as $(SRC)tareas.S -o $(OBJ)tareas.o -a > $(LST)tareas.lst
 
-$(OBJ)reset.o: $(SRC)reset.s
+$(OBJ)reset.o: $(SRC)reset.S
 	
 	mkdir -p bin
 	mkdir -p obj
 	mkdir -p lst
-	@echo "Compilando reset.s"
-	$(CHAIN)-as $(SRC)reset.s -o $(OBJ)reset.o -a > $(LST)reset.lst
+	@echo "Compilando reset.S"
+	$(CHAIN)-as $(SRC)reset.S -o $(OBJ)reset.o -a > $(LST)reset.lst
 
-$(OBJ)reset_vector.o: $(SRC)reset_vector.s
+$(OBJ)reset_vector.o: $(SRC)reset_vector.S
 	
 	mkdir -p bin
 	mkdir -p obj
 	mkdir -p lst
-	@echo "Compilando reset_vector.s"
-	$(CHAIN)-as $(SRC)reset_vector.s -o $(OBJ)reset_vector.o -a > $(LST)reset_vector.lst
+	@echo "Compilando reset_vector.S"
+	$(CHAIN)-as $(SRC)reset_vector.S -o $(OBJ)reset_vector.o -a > $(LST)reset_vector.lst
 
-$(OBJ)startup.o: $(SRC)startup.s
+$(OBJ)startup.o: $(SRC)startup.S
 	
 	mkdir -p bin
 	mkdir -p obj
 	mkdir -p lst
-	@echo "Compilando startup.s"
-	$(CHAIN)-as $(SRC)startup.s -o $(OBJ)startup.o -a > $(LST)startup.lst
+	@echo "Compilando startup.S"
+	$(CHAIN)-as $(SRC)startup.S -o $(OBJ)startup.o -a > $(LST)startup.lst
 
-$(OBJ)exception_handler.o: $(SRC)exception_handler.s
+$(OBJ)exception_handler.o: $(SRC)exception_handler.S
 	
 	mkdir -p bin
 	mkdir -p obj
 	mkdir -p lst
-	@echo "Compilando exception_handler.s"
-	$(CHAIN)-as $(SRC)exception_handler.s -o $(OBJ)exception_handler.o -a > $(LST)exception_handler.lst
+	@echo "Compilando exception_handler.S"
+	$(CHAIN)-as $(SRC)exception_handler.S -o $(OBJ)exception_handler.o -a > $(LST)exception_handler.lst
 
 #Ensamblado de archivo en c, genero los objetos
 
